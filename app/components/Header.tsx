@@ -1,5 +1,5 @@
 import {Suspense} from 'react';
-import { Await, NavLink, useAsyncValue } from 'react-router';
+import {Await, NavLink, useAsyncValue} from 'react-router';
 import {
   type CartViewPayload,
   useAnalytics,
@@ -27,7 +27,14 @@ export function Header({
   return (
     <header className="header">
       <NavLink prefetch="intent" to="/" style={activeLinkStyle} end>
-        <strong>{shop.name}</strong>
+        <h1 className="header-logo">
+          <img
+            src={`https://cdn.shopify.com/s/files/1/0906/1384/2263/files/logooo.svg?v=1748737870`}
+            alt={shop.name}
+            width={100}
+            height={100}
+          />
+        </h1>
       </NavLink>
       <HeaderMenu
         menu={menu}
