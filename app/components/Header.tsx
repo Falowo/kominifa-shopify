@@ -31,8 +31,8 @@ export function Header({
           <img
             src='https://cdn.shopify.com/s/files/1/0906/1384/2263/files/ejiogbe.svg?v=1748831331'
             alt={shop.name}
-            width={56}
-            height={56}
+            width={60}
+            height={60}
           />
         </h1>
       </NavLink>
