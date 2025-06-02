@@ -29,7 +29,7 @@ export function Header({
       <NavLink prefetch="intent" to="/" style={activeLinkStyle} end>
         <h1 className="header-logo">
           <img
-            src={`https://cdn.shopify.com/s/files/1/0906/1384/2263/files/logooo.svg?v=1748737870`}
+            src='https://cdn.shopify.com/s/files/1/0906/1384/2263/files/ejiogbe.svg?v=1748831331'
             alt={shop.name}
             width={100}
             height={100}
