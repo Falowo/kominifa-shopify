@@ -42,29 +42,17 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
  * fetched after the initial page load. If it's unavailable, the page should still 200.
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
-// function loadDeferredData({context}: LoaderFunctionArgs) {
-//   const recommendedProducts = context.storefront
-//     .query(RECOMMENDED_PRODUCTS_QUERY)
-//     .catch((error) => {
-//       // Log query errors, but don't throw them so the page can still render
-//       console.error(error);
-//       return null;
-//     });
-
-//   return {
-//     recommendedProducts,
-//   };
-// }
 function loadDeferredData({context}: LoaderFunctionArgs) {
-  const allProducts = context.storefront
-    .query(ALL_PRODUCTS_QUERY)
+  const recommendedProducts = context.storefront
+    .query(RECOMMENDED_PRODUCTS_QUERY)
     .catch((error) => {
+      // Log query errors, but don't throw them so the page can still render
       console.error(error);
       return null;
     });
 
   return {
-    allProducts,
+    recommendedProducts,
   };
 }
 
@@ -74,7 +62,7 @@ export default function Homepage() {
     <div className="home">
       <h1>Kominifa market place</h1>
       <CollectionsGrid collections={data.collections} />
-      {/* <RecommendedProducts products={data.recommendedProducts} /> */}
+      <RecommendedProducts products={data.recommendedProducts} />
     </div>
   );
 }
@@ -114,11 +102,11 @@ function CollectionsGrid({
 function RecommendedProducts({
   products,
 }: {
-  products: Promise<{products: {nodes: ProductType[]}} | null>;
+  products: Promise<RecommendedProductsQuery | null>;
 }) {
   return (
     <div className="recommended-products">
-      <h2>All Products</h2>
+      <h2>Recommended Products</h2>
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={products}>
           {(response) => (
@@ -136,31 +124,6 @@ function RecommendedProducts({
     </div>
   );
 }
-// function RecommendedProducts({
-//   products,
-// }: {
-//   products: Promise<RecommendedProductsQuery | null>;
-// }) {
-//   return (
-//     <div className="recommended-products">
-//       <h2>Recommended Products</h2>
-//       <Suspense fallback={<div>Loading...</div>}>
-//         <Await resolve={products}>
-//           {(response) => (
-//             <div className="recommended-products-grid">
-//               {response
-//                 ? response.products.nodes.map((product) => (
-//                     <ProductItem key={product.id} product={product} />
-//                   ))
-//                 : null}
-//             </div>
-//           )}
-//         </Await>
-//       </Suspense>
-//       <br />
-//     </div>
-//   );
-// }
 
 const FEATURED_COLLECTION_QUERY = `#graphql
   fragment FeaturedCollection on Collection {
@@ -214,31 +177,4 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   }
 ` as const;
 
-const ALL_PRODUCTS_QUERY = `#graphql
-  fragment ProductFields on Product {
-    id
-    title
-    handle
-    priceRange {
-      minVariantPrice {
-        amount
-        currencyCode
-      }
-    }
-    featuredImage {
-      id
-      url
-      altText
-      width
-      height
-    }
-  }
-  query AllProducts($country: CountryCode, $language: LanguageCode) 
-    @inContext(country: $country, language: $language) {
-    products(first: 100, sortKey: UPDATED_AT, reverse: true) {
-      nodes {
-        ...ProductFields
-      }
-    }
-  }
-` as const;
+
