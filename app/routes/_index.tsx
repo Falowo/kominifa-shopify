@@ -1,5 +1,5 @@
 import {type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import { Await, useLoaderData, Link, type MetaFunction } from 'react-router';
+import {Await, useLoaderData, Link, type MetaFunction} from 'react-router';
 import {Suspense} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
 import type {
@@ -33,7 +33,7 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
   ]);
 
   return {
-    featuredCollection: collections.nodes[0],
+    collections: collections.nodes as FeaturedCollectionFragment[],
   };
 }
 
@@ -42,17 +42,29 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
  * fetched after the initial page load. If it's unavailable, the page should still 200.
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
+// function loadDeferredData({context}: LoaderFunctionArgs) {
+//   const recommendedProducts = context.storefront
+//     .query(RECOMMENDED_PRODUCTS_QUERY)
+//     .catch((error) => {
+//       // Log query errors, but don't throw them so the page can still render
+//       console.error(error);
+//       return null;
+//     });
+
+//   return {
+//     recommendedProducts,
+//   };
+// }
 function loadDeferredData({context}: LoaderFunctionArgs) {
-  const recommendedProducts = context.storefront
-    .query(RECOMMENDED_PRODUCTS_QUERY)
+  const allProducts = context.storefront
+    .query(ALL_PRODUCTS_QUERY)
     .catch((error) => {
-      // Log query errors, but don't throw them so the page can still render
       console.error(error);
       return null;
     });
 
   return {
-    recommendedProducts,
+    allProducts,
   };
 }
 
@@ -60,42 +72,53 @@ export default function Homepage() {
   const data = useLoaderData<typeof loader>();
   return (
     <div className="home">
-      <FeaturedCollection collection={data.featuredCollection} />
-      <RecommendedProducts products={data.recommendedProducts} />
+      <h1>Kominifa market place</h1>
+      <CollectionsGrid collections={data.collections} />
+      {/* <RecommendedProducts products={data.recommendedProducts} /> */}
     </div>
   );
 }
 
-function FeaturedCollection({
-  collection,
+function CollectionsGrid({
+  collections,
 }: {
-  collection: FeaturedCollectionFragment;
+  collections: FeaturedCollectionFragment[];
 }) {
-  if (!collection) return null;
-  const image = collection?.image;
+  if (!collections?.length) return null;
   return (
-    <Link
-      className="featured-collection"
-      to={`/collections/${collection.handle}`}
-    >
-      {image && (
-        <div className="featured-collection-image">
-          <Image data={image} sizes="100vw" />
-        </div>
-      )}
-      <h1>{collection.title}</h1>
-    </Link>
+    <div className="collections-grid">
+      {collections.map((collection) => (
+        <Link
+          key={collection.id}
+          className="collection-card"
+          to={`/collections/${collection.handle}`}
+        >
+          {collection.image && (
+            <div className="collection-image">
+              <Image
+                data={collection.image}
+                sizes="(min-width: 768px) 25vw, 50vw"
+                width={collection?.image?.width ?? undefined}
+                height={collection?.image?.height ?? undefined}
+                style={{objectFit: 'cover', width: '100%', height: '200px'}}
+              />
+            </div>
+          )}
+          <div className="collection-title">{collection.title}</div>
+        </Link>
+      ))}
+    </div>
   );
 }
 
 function RecommendedProducts({
   products,
 }: {
-  products: Promise<RecommendedProductsQuery | null>;
+  products: Promise<{products: {nodes: ProductType[]}} | null>;
 }) {
   return (
     <div className="recommended-products">
-      <h2>Recommended Products</h2>
+      <h2>All Products</h2>
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={products}>
           {(response) => (
@@ -113,6 +136,31 @@ function RecommendedProducts({
     </div>
   );
 }
+// function RecommendedProducts({
+//   products,
+// }: {
+//   products: Promise<RecommendedProductsQuery | null>;
+// }) {
+//   return (
+//     <div className="recommended-products">
+//       <h2>Recommended Products</h2>
+//       <Suspense fallback={<div>Loading...</div>}>
+//         <Await resolve={products}>
+//           {(response) => (
+//             <div className="recommended-products-grid">
+//               {response
+//                 ? response.products.nodes.map((product) => (
+//                     <ProductItem key={product.id} product={product} />
+//                   ))
+//                 : null}
+//             </div>
+//           )}
+//         </Await>
+//       </Suspense>
+//       <br />
+//     </div>
+//   );
+// }
 
 const FEATURED_COLLECTION_QUERY = `#graphql
   fragment FeaturedCollection on Collection {
@@ -129,7 +177,7 @@ const FEATURED_COLLECTION_QUERY = `#graphql
   }
   query FeaturedCollection($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    collections(first: 1, sortKey: UPDATED_AT, reverse: true) {
+    collections(first: 20, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...FeaturedCollection
       }
@@ -161,6 +209,35 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     products(first: 4, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedProduct
+      }
+    }
+  }
+` as const;
+
+const ALL_PRODUCTS_QUERY = `#graphql
+  fragment ProductFields on Product {
+    id
+    title
+    handle
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    featuredImage {
+      id
+      url
+      altText
+      width
+      height
+    }
+  }
+  query AllProducts($country: CountryCode, $language: LanguageCode) 
+    @inContext(country: $country, language: $language) {
+    products(first: 100, sortKey: UPDATED_AT, reverse: true) {
+      nodes {
+        ...ProductFields
       }
     }
   }
