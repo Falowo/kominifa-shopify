@@ -9,7 +9,7 @@ import type {
 import {ProductItem} from '~/components/ProductItem';
 
 export const meta: MetaFunction = () => {
-  return [{title: 'Kominifa market place'}];
+  return [{title: 'Kominifa Shopify | Collections'}];
 };
 
 export async function loader(args: LoaderFunctionArgs) {
