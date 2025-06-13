@@ -7,6 +7,8 @@ import {
 } from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
+import { CountrySelector } from './CountrySelector';
+import { useCountry } from './CountryProvider'; 
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -24,13 +26,15 @@ export function Header({
   publicStoreDomain,
 }: HeaderProps) {
   const {shop, menu} = header;
+  const {country} = useCountry();
+  const pathPrefix = country === 'US' ? '' : `/${country.toLowerCase()}`;
   return (
     <header className="header">
-      <NavLink prefetch="intent" to="/" style={activeLinkStyle} end>
+      <NavLink prefetch="intent" to={`${pathPrefix}/`} style={activeLinkStyle} end>
         <h1 className="header-logo">
           <img
             src='https://cdn.shopify.com/s/files/1/0906/1384/2263/files/ejiogbe.svg?v=1748831331'
-            alt={shop.name}
+            alt={shop?.name || 'Kominifa Shopify Store'}
             width={60}
             height={60}
           />
@@ -60,6 +64,8 @@ export function HeaderMenu({
 }) {
   const className = `header-menu-${viewport}`;
   const {close} = useAside();
+  const {country} = useCountry();
+  const pathPrefix = country === 'US' ? '' : `/${country.toLowerCase()}`;
 
   return (
     <nav className={className} role="navigation">
@@ -69,7 +75,7 @@ export function HeaderMenu({
           onClick={close}
           prefetch="intent"
           style={activeLinkStyle}
-          to="/"
+          to={`${pathPrefix}/`}
         >
           Home
         </NavLink>
@@ -92,7 +98,7 @@ export function HeaderMenu({
             onClick={close}
             prefetch="intent"
             style={activeLinkStyle}
-            to={url}
+            to={`${pathPrefix}${url}`}
           >
             {item.title}
           </NavLink>
@@ -106,10 +112,13 @@ function HeaderCtas({
   isLoggedIn,
   cart,
 }: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
+  const {country} = useCountry();
+  const pathPrefix = country === 'US' ? '' : `/${country.toLowerCase()}`;
   return (
     <nav className="header-ctas" role="navigation">
       <HeaderMenuMobileToggle />
-      <NavLink prefetch="intent" to="/account" style={activeLinkStyle}>
+      <CountrySelector />
+      <NavLink prefetch="intent" to={`${pathPrefix}/account`} style={activeLinkStyle}>
         <Suspense fallback="Sign in">
           <Await resolve={isLoggedIn} errorElement="Sign in">
             {(isLoggedIn) => (isLoggedIn ? 'Account' : 'Sign in')}

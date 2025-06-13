@@ -7,6 +7,13 @@ import type {
   RecommendedProductsQuery,
 } from 'storefrontapi.generated';
 import {ProductItem} from '~/components/ProductItem';
+import {useCountry} from '~/components/CountryProvider';
+
+// function SomeComponent() {
+//   const {country} = useCountry();
+
+//   // Use `country` in your Storefront API queries
+// }
 
 export const meta: MetaFunction = () => {
   return [{title: 'Kominifa Shopify | Collections'}];
@@ -58,6 +65,7 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
+
   return (
     <div className="home">
       <h1>Kominifa market place</h1>
@@ -73,13 +81,15 @@ function CollectionsGrid({
   collections: FeaturedCollectionFragment[];
 }) {
   if (!collections?.length) return null;
+  const {country} = useCountry();
+  const pathPrefix = country === 'US' ? '' : `/${country.toLowerCase()}`;
   return (
     <div className="collections-grid">
       {collections.map((collection) => (
         <Link
           key={collection.id}
           className="collection-card"
-          to={`/collections/${collection.handle}`}
+          to={`${pathPrefix}/collections/${collection.handle}`}
         >
           {collection.image && (
             <div className="collection-image">
@@ -104,6 +114,7 @@ function RecommendedProducts({
 }: {
   products: Promise<RecommendedProductsQuery | null>;
 }) {
+
   return (
     <div className="recommended-products">
       <h2>Recommended Products</h2>
@@ -169,12 +180,10 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   }
   query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 16, sortKey: UPDATED_AT, reverse: true) {
+    products(first: 100, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedProduct
       }
     }
   }
 ` as const;
-
-

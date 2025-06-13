@@ -16,6 +16,9 @@ import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
+import {getLocaleFromRequest} from '~/lib/utils';
+
+import {CountryProvider} from './components/CountryProvider';
 
 export type RootLoader = typeof loader;
 
@@ -74,6 +77,29 @@ export async function loader(args: LoaderFunctionArgs) {
 
   const {storefront, env} = args.context;
 
+  console.log(
+    `Loading root data for storefront: ${env.PUBLIC_STORE_DOMAIN} with storefront ID: ${env.PUBLIC_STOREFRONT_ID}`,
+  );
+  console.log('Deferred Data:', deferredData);
+  console.log('Critical Data:', criticalData);
+  console.log('Public Store Domain:', env.PUBLIC_STORE_DOMAIN);
+  console.log('Public Storefront ID:', env.PUBLIC_STOREFRONT_ID);
+  console.log('Storefront:', storefront);
+  console.log('args.context:', args.context);
+  console.log(
+    'args.context.storefront.i18n.country:',
+    args.context.storefront.i18n.country,
+  );
+  console.log(
+    'getLocaleFromRequest || args.context.storefront.i18n.language:',
+    (getLocaleFromRequest(args.request)?.language ??
+      args.context.storefront.i18n.language) ||
+      'undefined',
+  );
+  console.log('Request:', args.request);
+  const locale = getLocaleFromRequest(args.request);
+  console.log('Locale:', locale);
+
   return {
     ...deferredData,
     ...criticalData,
@@ -87,9 +113,17 @@ export async function loader(args: LoaderFunctionArgs) {
       storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
       withPrivacyBanner: true,
       // localize the privacy banner
-      country: args.context.storefront.i18n.country,
-      language: args.context.storefront.i18n.language,
+      country:
+        getLocaleFromRequest(args.request)?.country ??
+        args.context.storefront.i18n.country ??
+        'US',
+      language:
+        getLocaleFromRequest(args.request)?.language ??
+        args.context.storefront.i18n.language ??
+        'EN',
     },
+
+    selectedLocale: getLocaleFromRequest(args.request),
   };
 }
 
@@ -157,13 +191,15 @@ export function Layout({children}: {children?: React.ReactNode}) {
       </head>
       <body>
         {data ? (
-          <Analytics.Provider
-            cart={data.cart}
-            shop={data.shop}
-            consent={data.consent}
-          >
-            <PageLayout {...data}>{children}</PageLayout>
-          </Analytics.Provider>
+          <CountryProvider initialCountry="US">
+            <Analytics.Provider
+              cart={data.cart}
+              shop={data.shop}
+              consent={data.consent}
+            >
+              <PageLayout {...data}>{children}</PageLayout>
+            </Analytics.Provider>
+          </CountryProvider>
         ) : (
           children
         )}

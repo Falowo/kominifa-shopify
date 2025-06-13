@@ -1,6 +1,8 @@
 import { Link } from 'react-router';
 import {Image, Money, Pagination} from '@shopify/hydrogen';
 import {urlWithTrackingParams, type RegularSearchReturn} from '~/lib/search';
+import { useCountry } from './CountryProvider';
+
 
 type SearchItems = RegularSearchReturn['result']['items'];
 type PartialSearchResult<ItemType extends keyof SearchItems> = Pick<
@@ -37,6 +39,8 @@ function SearchResultsArticles({
   if (!articles?.nodes.length) {
     return null;
   }
+  const {country} = useCountry();
+  const pathPrefix =`/${country.toLowerCase()}`;
 
   return (
     <div className="search-result">
@@ -44,7 +48,7 @@ function SearchResultsArticles({
       <div>
         {articles?.nodes?.map((article) => {
           const articleUrl = urlWithTrackingParams({
-            baseUrl: `/blogs/${article.handle}`,
+            baseUrl: `${pathPrefix}/blogs/${article.handle}`,
             trackingParams: article.trackingParameters,
             term,
           });
@@ -64,6 +68,8 @@ function SearchResultsArticles({
 }
 
 function SearchResultsPages({term, pages}: PartialSearchResult<'pages'>) {
+  const {country} = useCountry();
+  const pathPrefix =`/${country.toLowerCase()}`;
   if (!pages?.nodes.length) {
     return null;
   }
@@ -74,7 +80,7 @@ function SearchResultsPages({term, pages}: PartialSearchResult<'pages'>) {
       <div>
         {pages?.nodes?.map((page) => {
           const pageUrl = urlWithTrackingParams({
-            baseUrl: `/pages/${page.handle}`,
+            baseUrl: `${pathPrefix}/pages/${page.handle}`,
             trackingParams: page.trackingParameters,
             term,
           });
@@ -97,6 +103,8 @@ function SearchResultsProducts({
   term,
   products,
 }: PartialSearchResult<'products'>) {
+  const {country} = useCountry();
+  const pathPrefix =`/${country.toLowerCase()}`;
   if (!products?.nodes.length) {
     return null;
   }
@@ -108,7 +116,7 @@ function SearchResultsProducts({
         {({nodes, isLoading, NextLink, PreviousLink}) => {
           const ItemsMarkup = nodes.map((product) => {
             const productUrl = urlWithTrackingParams({
-              baseUrl: `/products/${product.handle}`,
+              baseUrl: `${pathPrefix}/products/${product.handle}`,
               trackingParams: product.trackingParameters,
               term,
             });

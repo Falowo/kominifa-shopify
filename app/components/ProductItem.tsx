@@ -6,6 +6,7 @@ import type {
   RecommendedProductFragment,
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
+import {useCountry} from '~/components/CountryProvider';
 
 export function ProductItem({
   product,
@@ -19,12 +20,14 @@ export function ProductItem({
 }) {
   const variantUrl = useVariantUrl(product.handle);
   const image = product.featuredImage;
+     const {country} = useCountry();
+  const pathPrefix = country === 'US' ? '' : `/${country.toLowerCase()}`;
   return (
     <Link
       className="product-item"
       key={product.id}
       prefetch="intent"
-      to={variantUrl}
+      to={`${pathPrefix}${variantUrl}`}
     >
       {image && (
         <Image

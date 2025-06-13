@@ -1,5 +1,6 @@
 import type {LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {getSitemap} from '@shopify/hydrogen';
+import {countries} from '~/data/countries';
 
 export async function loader({
   request,
@@ -10,15 +11,14 @@ export async function loader({
     storefront,
     request,
     params,
-    locales: ['EN-US', 'EN-CA', 'FR-CA'],
+    locales: Object.keys(countries),
     getLink: ({type, baseUrl, handle, locale}) => {
       if (!locale) return `${baseUrl}/${type}/${handle}`;
       return `${baseUrl}/${locale}/${type}/${handle}`;
     },
   });
 
-  response.headers.set('Cache-Control', `max-age=${60 * 60 * 24}`);
+  response.headers.set('Cache-Control', `max-age=${60 * 60 * 24}`); // 1 day
 
   return response;
 }
-

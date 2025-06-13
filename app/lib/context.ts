@@ -1,6 +1,7 @@
 import {createHydrogenContext} from '@shopify/hydrogen';
 import {AppSession} from '~/lib/session';
 import {CART_QUERY_FRAGMENT} from '~/lib/fragments';
+import {getLocaleFromRequest} from './utils';
 
 /**
  * The context implementation is separate from server.ts
@@ -30,11 +31,20 @@ export async function createAppLoadContext(
     cache,
     waitUntil,
     session,
-    i18n: {language: 'EN', country: 'US'},
+    i18n: {
+      language: getLocaleFromRequest(request)?.language ?? "EN",
+      country: getLocaleFromRequest(request)?.country ?? "US",
+    },
     cart: {
       queryFragment: CART_QUERY_FRAGMENT,
     },
   });
+
+  console.log('Hydrogen context created:', hydrogenContext);
+  console.log('i18n language:', hydrogenContext.storefront.i18n.language);
+  console.log('i18n country:', hydrogenContext.storefront.i18n.country);
+  console.log('Request URL:', request.url);
+  console.log('Locale from request:', getLocaleFromRequest(request));
 
   return {
     ...hydrogenContext,
