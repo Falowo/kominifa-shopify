@@ -35,9 +35,20 @@ export function CountrySelector() {
   console.log('Country List:', countryList);
   console.log('Old Path Prefix:', oldPrefix);
   return (
-    <select defaultValue={country} onChange={handleChange}>
+    <select
+      defaultValue={country || selectedLocale?.country || 'us'}
+      onChange={handleChange}
+      style={{
+        width: '92px',
+        minWidth: '92px',
+        maxWidth: '92px',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      }}
+    >
       {countryList.map(({code, name}) => (
-        <option key={code} value={code}>
+        <option key={code} value={code} >
           {name}
         </option>
       ))}
