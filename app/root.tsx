@@ -113,14 +113,8 @@ export async function loader(args: LoaderFunctionArgs) {
       storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
       withPrivacyBanner: true,
       // localize the privacy banner
-      country:
-        getLocaleFromRequest(args.request)?.country ??
-        args.context.storefront.i18n.country ??
-        'US',
-      language:
-        getLocaleFromRequest(args.request)?.language ??
-        args.context.storefront.i18n.language ??
-        'EN',
+      country: args.context.storefront.i18n.country,
+      language: args.context.storefront.i18n.language,
     },
 
     selectedLocale: getLocaleFromRequest(args.request),
