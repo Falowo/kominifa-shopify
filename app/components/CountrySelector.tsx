@@ -14,13 +14,18 @@ export function CountrySelector() {
     name: country.name,
   }));
   const {country, setCountry} = useCountry();
-  const oldPrefix = selectedLocale?.pathPrefix || `/${country}` ||'';
+  const oldPrefix = selectedLocale?.pathPrefix ? selectedLocale?.pathPrefix : country ? `/${country.toLowerCase()}` : '/us';
+  console.log('Old Prefix:', oldPrefix);
+  console.log('Selected Locale:', selectedLocale);
+  console.log('Country:', country);
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newLocale = event.target.value.toLowerCase();
     console.log('New Locale:', newLocale);
+    const strippedPath = location.pathname.replace(oldPrefix, '');
+    console.log('Stripped Path:', strippedPath);
     navigate(
-      `/${newLocale}${location.pathname.replace(oldPrefix, '').replace(`${country}/`, '')}${location.search.toLowerCase()}`,
+      `/${newLocale}${strippedPath}${location.search.toLowerCase()}`,
     );
     setCountry(newLocale);
   };
