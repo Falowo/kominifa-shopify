@@ -7,7 +7,6 @@ import {useCountry} from './CountryProvider';
 
 export function CountrySelector() {
   const {selectedLocale} = useLoaderData() as {selectedLocale: Locale};
-  const oldPrefix = selectedLocale?.pathPrefix || '';
   const navigate = useNavigate();
   const location = useLocation();
   const countryList = Object.entries(countries).map(([code, country]) => ({
@@ -15,12 +14,13 @@ export function CountrySelector() {
     name: country.name,
   }));
   const {country, setCountry} = useCountry();
+  const oldPrefix = selectedLocale?.pathPrefix || `/${country}` ||'';
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newLocale = event.target.value.toLowerCase();
     console.log('New Locale:', newLocale);
     navigate(
-      `${newLocale}${location.pathname.replace(oldPrefix, '').replace(`${country}/`, '')}${location.search.toLowerCase()}`,
+      `/${newLocale}${location.pathname.replace(oldPrefix, '').replace(`${country}/`, '')}${location.search.toLowerCase()}`,
     );
     setCountry(newLocale);
   };
