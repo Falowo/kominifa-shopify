@@ -3,8 +3,6 @@ import type {Locale} from '~/data/countries';
 import {countries} from 'countries-list';
 import {useCountry} from './CountryProvider';
 
- 
-
 export function CountrySelector() {
   const {selectedLocale} = useLoaderData() as {selectedLocale: Locale};
   const navigate = useNavigate();
@@ -14,7 +12,11 @@ export function CountrySelector() {
     name: country.name,
   }));
   const {country, setCountry} = useCountry();
-  const oldPrefix = selectedLocale?.pathPrefix ? selectedLocale?.pathPrefix : country ? `/${country.toLowerCase()}` : '/us';
+  const oldPrefix = country
+    ? `/${country.toLowerCase()}`
+    : selectedLocale?.pathPrefix
+      ? selectedLocale?.pathPrefix
+      : '/us';
   console.log('Old Prefix:', oldPrefix);
   console.log('Selected Locale:', selectedLocale);
   console.log('Country:', country);
@@ -24,9 +26,7 @@ export function CountrySelector() {
     console.log('New Locale:', newLocale);
     const strippedPath = location.pathname.replace(oldPrefix, '');
     console.log('Stripped Path:', strippedPath);
-    navigate(
-      `/${newLocale}${strippedPath}${location.search.toLowerCase()}`,
-    );
+    navigate(`/${newLocale}${strippedPath}${location.search.toLowerCase()}`);
     setCountry(newLocale);
   };
 
