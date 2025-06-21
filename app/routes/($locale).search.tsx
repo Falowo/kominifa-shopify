@@ -2,7 +2,7 @@ import {
   type LoaderFunctionArgs,
   type ActionFunctionArgs,
 } from '@shopify/remix-oxygen';
-import { useLoaderData, type MetaFunction } from 'react-router';
+import {useLoaderData, type MetaFunction} from 'react-router';
 import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
 import {SearchForm} from '~/components/SearchForm';
 import {SearchResults} from '~/components/SearchResults';
@@ -13,7 +13,7 @@ import {
 } from '~/lib/search';
 
 export const meta: MetaFunction = () => {
-  return [{title: `Kominifa Shopify | Search`}];
+  return [{title: `Hydrogen | Search`}];
 };
 
 export async function loader({request, context}: LoaderFunctionArgs) {

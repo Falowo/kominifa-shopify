@@ -6,7 +6,7 @@ import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
-  return [{title: `Kominifa Shopify | ${data?.collection.title ?? ''}`}];
+  return [{title: `Hydrogen | ${data?.collection.title ?? ''} Collection`}];
 };
 
 export async function loader(args: LoaderFunctionArgs) {
@@ -15,6 +15,8 @@ export async function loader(args: LoaderFunctionArgs) {
 
   // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
+
+  
 
   return {...deferredData, ...criticalData};
 }
@@ -28,7 +30,8 @@ async function loadCriticalData({
   params,
   request,
 }: LoaderFunctionArgs) {
-  const {handle} = params;
+  const {handle, locale} = params;
+  
   const {storefront} = context;
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 8,
@@ -37,6 +40,8 @@ async function loadCriticalData({
   if (!handle) {
     throw redirect('/collections');
   }
+  
+  
 
   const [{collection}] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
@@ -44,6 +49,8 @@ async function loadCriticalData({
       // Add other queries here, so that they are loaded in parallel
     }),
   ]);
+
+// If the locale param is missing or doesn't match the expected locale, redirect
 
   if (!collection) {
     throw new Response(`Collection ${handle} not found`, {
@@ -53,6 +60,7 @@ async function loadCriticalData({
 
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, {handle, data: collection});
+  // redirectIfCountryKeyChanged({pathname});
 
   return {
     collection,
@@ -70,6 +78,7 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 
 export default function Collection() {
   const {collection} = useLoaderData<typeof loader>();
+
 
   return (
     <div className="collection">

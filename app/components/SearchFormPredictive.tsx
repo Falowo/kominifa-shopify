@@ -1,7 +1,13 @@
-import { useFetcher, useNavigate, type FormProps, type Fetcher } from 'react-router';
+import {
+  useFetcher,
+  useNavigate,
+  type FormProps,
+  type Fetcher,
+} from 'react-router';
 import React, {useRef, useEffect} from 'react';
 import type {PredictiveSearchReturn} from '~/lib/search';
 import {useAside} from './Aside';
+import {useCountry} from './CountryProvider';
 
 type SearchFormPredictiveChildren = (args: {
   fetchResults: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -28,6 +34,7 @@ export function SearchFormPredictive({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
   const aside = useAside();
+  const {country} = useCountry();
 
   /** Reset the input value and blur the input */
   function resetInput(event: React.FormEvent<HTMLFormElement>) {
@@ -41,7 +48,12 @@ export function SearchFormPredictive({
   /** Navigate to the search page with the current input value */
   function goToSearch() {
     const term = inputRef?.current?.value;
-    navigate(SEARCH_ENDPOINT + (term ? `?q=${term}` : ''));
+    console.log("country is", country);
+    navigate(
+      `${country.country === 'US' ? '' : `/${country.language.toLowerCase()}-${country.country.toLocaleLowerCase()}`}` +
+        SEARCH_ENDPOINT +
+        (term ? `?q=${term}` : ''),
+    );
     aside.close();
   }
 

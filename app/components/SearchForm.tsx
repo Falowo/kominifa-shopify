@@ -1,5 +1,6 @@
 import {useRef, useEffect} from 'react';
-import { Form, type FormProps } from 'react-router';
+import {Form, type FormProps} from 'react-router';
+import { useCountry} from '~/components/CountryProvider';
 
 type SearchFormProps = Omit<FormProps, 'children'> & {
   children: (args: {
@@ -28,6 +29,7 @@ type SearchFormProps = Omit<FormProps, 'children'> & {
  */
 export function SearchForm({children, ...props}: SearchFormProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const {country} = useCountry();
 
   useFocusOnCmdK(inputRef);
 

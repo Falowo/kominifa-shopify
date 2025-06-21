@@ -1,4 +1,5 @@
-import { Await, Link } from 'react-router';
+import {Await} from 'react-router';
+import {Link} from '~/components/Link';
 import {Suspense, useId} from 'react';
 import type {
   CartApiQueryFragment,
@@ -21,6 +22,10 @@ interface PageLayoutProps {
   header: HeaderQuery;
   isLoggedIn: Promise<boolean>;
   publicStoreDomain: string;
+  i18n: {
+    country: string;
+    language: string;
+  };
   children?: React.ReactNode;
 }
 
@@ -31,6 +36,7 @@ export function PageLayout({
   header,
   isLoggedIn,
   publicStoreDomain,
+  i18n,
 }: PageLayoutProps) {
   return (
     <Aside.Provider>
@@ -39,6 +45,7 @@ export function PageLayout({
       <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
       {header && (
         <Header
+          i18n={i18n}
           header={header}
           cart={cart}
           isLoggedIn={isLoggedIn}

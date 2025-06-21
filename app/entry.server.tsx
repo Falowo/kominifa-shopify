@@ -15,8 +15,7 @@ export default async function handleRequest(
   const {nonce, header, NonceProvider} = createContentSecurityPolicy({
     shop: {
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
-      // storeDomain: context.env.PUBLIC_STORE_DOMAIN,
-      storeDomain: context.env.HOST,
+      storeDomain: context.env.PUBLIC_STORE_DOMAIN,
     },
   });
 

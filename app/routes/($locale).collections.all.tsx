@@ -5,7 +5,7 @@ import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem} from '~/components/ProductItem';
 
 export const meta: MetaFunction<typeof loader> = () => {
-  return [{title: `Kominifa Shopify | Products`}];
+  return [{title: `Hydrogen | Products`}];
 };
 
 export async function loader(args: LoaderFunctionArgs) {

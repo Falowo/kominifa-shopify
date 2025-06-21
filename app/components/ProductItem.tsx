@@ -20,14 +20,13 @@ export function ProductItem({
 }) {
   const variantUrl = useVariantUrl(product.handle);
   const image = product.featuredImage;
-     const {country} = useCountry();
-  const pathPrefix = country === 'US' ? '' : `/${country.toLowerCase()}`;
+
   return (
     <Link
       className="product-item"
       key={product.id}
       prefetch="intent"
-      to={`${pathPrefix}${variantUrl}`}
+      to={variantUrl}
     >
       {image && (
         <Image

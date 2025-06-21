@@ -10,15 +10,19 @@ import {
   Scripts,
   ScrollRestoration,
   useRouteLoaderData,
+  redirect,
 } from 'react-router';
 import favicon from '~/assets/favicon.svg';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
+import tailwindCss from './styles/tailwind.css?url';
 import {PageLayout} from './components/PageLayout';
-import {getLocaleFromRequest} from '~/lib/utils';
-
+import {getLocaleFromRequest, I18nLocale} from './lib/i18n';
 import {CountryProvider} from './components/CountryProvider';
+import {l} from 'node_modules/react-router/dist/development/lib-CCSAGgcP.mjs';
+import {Header} from './components/Header';
+import {Locale} from './data/countries';
 
 export type RootLoader = typeof loader;
 
@@ -77,28 +81,7 @@ export async function loader(args: LoaderFunctionArgs) {
 
   const {storefront, env} = args.context;
 
-  console.log(
-    `Loading root data for storefront: ${env.PUBLIC_STORE_DOMAIN} with storefront ID: ${env.PUBLIC_STOREFRONT_ID}`,
-  );
-  console.log('Deferred Data:', deferredData);
-  console.log('Critical Data:', criticalData);
-  console.log('Public Store Domain:', env.PUBLIC_STORE_DOMAIN);
-  console.log('Public Storefront ID:', env.PUBLIC_STOREFRONT_ID);
-  console.log('Storefront:', storefront);
-  console.log('args.context:', args.context);
-  console.log(
-    'args.context.storefront.i18n.country:',
-    args.context.storefront.i18n.country,
-  );
-  console.log(
-    'getLocaleFromRequest || args.context.storefront.i18n.language:',
-    (getLocaleFromRequest(args.request)?.language ??
-      args.context.storefront.i18n.language) ||
-      'undefined',
-  );
-  console.log('Request:', args.request);
-  const locale = getLocaleFromRequest(args.request);
-  console.log('Locale:', locale);
+  // ...res
 
   return {
     ...deferredData,
@@ -111,13 +94,17 @@ export async function loader(args: LoaderFunctionArgs) {
     consent: {
       checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
       storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
-      withPrivacyBanner: true,
+      withPrivacyBanner: false,
       // localize the privacy banner
       country: args.context.storefront.i18n.country,
       language: args.context.storefront.i18n.language,
     },
-
-    selectedLocale: getLocaleFromRequest(args.request),
+    i18n: {
+      country: args.context.storefront.i18n.country,
+      language: args.context.storefront.i18n.language,
+      pathPrefix: args.context.storefront.i18n.pathPrefix,
+    },
+    selectedLocale: getLocaleFromRequest(args.request) as I18nLocale,
   };
 }
 
@@ -174,10 +161,11 @@ export function Layout({children}: {children?: React.ReactNode}) {
   const data = useRouteLoaderData<RootLoader>('root');
 
   return (
-    <html lang="en">
+    <html lang={`en`}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <link rel="stylesheet" href={tailwindCss}></link>
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
         <Meta />
@@ -185,7 +173,7 @@ export function Layout({children}: {children?: React.ReactNode}) {
       </head>
       <body>
         {data ? (
-          <CountryProvider initialCountry="US">
+          <CountryProvider initialCountry={data.selectedLocale as Locale}>
             <Analytics.Provider
               cart={data.cart}
               shop={data.shop}

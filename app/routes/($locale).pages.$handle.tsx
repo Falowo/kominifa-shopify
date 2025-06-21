@@ -1,9 +1,9 @@
 import {type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import { useLoaderData, type MetaFunction } from 'react-router';
+import {useLoaderData, type MetaFunction} from 'react-router';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
-  return [{title: `Kominifa Shopify | ${data?.page.title ?? ''}`}];
+  return [{title: `Hydrogen | ${data?.page.title ?? ''}`}];
 };
 
 export async function loader(args: LoaderFunctionArgs) {

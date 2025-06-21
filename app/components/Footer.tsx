@@ -1,7 +1,7 @@
 import {Suspense} from 'react';
-import {Await, NavLink} from 'react-router';
+import {Await, } from 'react-router';
+import {NavLink} from '~/components/Link';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
-import {useCountry} from './CountryProvider';
 
 interface FooterProps {
   footer: Promise<FooterQuery | null>;
@@ -14,7 +14,6 @@ export function Footer({
   header,
   publicStoreDomain,
 }: FooterProps) {
- 
   return (
     <Suspense>
       <Await resolve={footerPromise}>
@@ -43,8 +42,6 @@ function FooterMenu({
   primaryDomainUrl: FooterProps['header']['shop']['primaryDomain']['url'];
   publicStoreDomain: string;
 }) {
-   const {country} = useCountry();
-  const pathPrefix =`/${country.toLowerCase()}`;
   return (
     <nav className="footer-menu" role="navigation">
       {(menu || FALLBACK_FOOTER_MENU).items.map((item) => {
@@ -67,7 +64,7 @@ function FooterMenu({
             key={item.id}
             prefetch="intent"
             style={activeLinkStyle}
-            to={`${pathPrefix}${url}`}
+            to={url}
           >
             {item.title}
           </NavLink>

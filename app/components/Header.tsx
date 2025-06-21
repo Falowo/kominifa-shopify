@@ -1,5 +1,6 @@
-import {Suspense} from 'react';
-import {Await, NavLink, useAsyncValue} from 'react-router';
+import {Suspense, CSSProperties} from 'react';
+import {NavLink} from '~/components/Link';
+import {Await, useAsyncValue} from 'react-router';
 import {
   type CartViewPayload,
   useAnalytics,
@@ -7,14 +8,17 @@ import {
 } from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
-import { CountrySelector } from './CountrySelector';
-import { useCountry } from './CountryProvider'; 
+import {CountrySelector} from './CountrySelector';
 
 interface HeaderProps {
   header: HeaderQuery;
   cart: Promise<CartApiQueryFragment | null>;
   isLoggedIn: Promise<boolean>;
   publicStoreDomain: string;
+  i18n: {
+    country: string;
+    language: string;
+  };
 }
 
 type Viewport = 'desktop' | 'mobile';
@@ -24,21 +28,18 @@ export function Header({
   isLoggedIn,
   cart,
   publicStoreDomain,
+  i18n: {country, language},
 }: HeaderProps) {
   const {shop, menu} = header;
-  const {country} = useCountry();
-  const pathPrefix = country === 'US' ? '' : `/${country.toLowerCase()}`;
   return (
     <header className="header">
-      <NavLink prefetch="intent" to={`${pathPrefix}/`} style={activeLinkStyle} end>
-        <h1 className="header-logo">
-          <img
-            src='https://cdn.shopify.com/s/files/1/0906/1384/2263/files/ejiogbe.svg?v=1748831331'
-            alt={shop?.name || 'Kominifa Shopify Store'}
-            width={60}
-            height={60}
-          />
-        </h1>
+      <NavLink prefetch="intent" to="/" style={activeLinkStyle} end>
+        <img
+          src="https://cdn.shopify.com/s/files/1/0906/1384/2263/files/ejiogbe.svg?v=1748831331"
+          alt={shop?.name || 'Kominifa Shopify Store'}
+          width={60}
+          height={60}
+        />
       </NavLink>
       <HeaderMenu
         menu={menu}
@@ -46,7 +47,11 @@ export function Header({
         primaryDomainUrl={header.shop.primaryDomain.url}
         publicStoreDomain={publicStoreDomain}
       />
-      <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
+      <HeaderCtas
+        isLoggedIn={isLoggedIn}
+        cart={cart}
+        i18n={{country, language}}
+      />
     </header>
   );
 }
@@ -62,10 +67,9 @@ export function HeaderMenu({
   viewport: Viewport;
   publicStoreDomain: HeaderProps['publicStoreDomain'];
 }) {
+  // const prefix=`/${i18n.language}-${i18n.country}`; // e.g., /en-US
   const className = `header-menu-${viewport}`;
   const {close} = useAside();
-  const {country} = useCountry();
-  const pathPrefix = country === 'US' ? '' : `/${country.toLowerCase()}`;
 
   return (
     <nav className={className} role="navigation">
@@ -74,8 +78,8 @@ export function HeaderMenu({
           end
           onClick={close}
           prefetch="intent"
-          style={activeLinkStyle}
-          to={`${pathPrefix}/`}
+          style={activeLinkStyle as CSSProperties}
+          to={`/`}
         >
           Home
         </NavLink>
@@ -98,7 +102,7 @@ export function HeaderMenu({
             onClick={close}
             prefetch="intent"
             style={activeLinkStyle}
-            to={`${pathPrefix}${url}`}
+            to={url}
           >
             {item.title}
           </NavLink>
@@ -111,14 +115,13 @@ export function HeaderMenu({
 function HeaderCtas({
   isLoggedIn,
   cart,
-}: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
-  const {country} = useCountry();
-  const pathPrefix = country === 'US' ? '' : `/${country.toLowerCase()}`;
+  i18n: {country, language},
+}: Pick<HeaderProps, 'isLoggedIn' | 'cart' | 'i18n'>) {
   return (
     <nav className="header-ctas" role="navigation">
       <HeaderMenuMobileToggle />
       <CountrySelector />
-      <NavLink prefetch="intent" to={`${pathPrefix}/account`} style={activeLinkStyle}>
+      <NavLink prefetch="intent" to="/account" style={activeLinkStyle}>
         <Suspense fallback="Sign in">
           <Await resolve={isLoggedIn} errorElement="Sign in">
             {(isLoggedIn) => (isLoggedIn ? 'Account' : 'Sign in')}
@@ -239,7 +242,7 @@ function activeLinkStyle({
 }: {
   isActive: boolean;
   isPending: boolean;
-}) {
+}): CSSProperties {
   return {
     fontWeight: isActive ? 'bold' : undefined,
     color: isPending ? 'grey' : 'black',

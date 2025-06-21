@@ -1,22 +1,17 @@
 import {type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {Await, useLoaderData, Link, type MetaFunction} from 'react-router';
+import {Await, useLoaderData, type MetaFunction} from 'react-router';
+import {Link} from '~/components/Link';
 import {Suspense} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
 import type {
   FeaturedCollectionFragment,
+  RecommendedProductFragment,
   RecommendedProductsQuery,
 } from 'storefrontapi.generated';
 import {ProductItem} from '~/components/ProductItem';
-import {useCountry} from '~/components/CountryProvider';
-
-// function SomeComponent() {
-//   const {country} = useCountry();
-
-//   // Use `country` in your Storefront API queries
-// }
 
 export const meta: MetaFunction = () => {
-  return [{title: 'Kominifa Shopify | Collections'}];
+  return [{title: 'Kominifa | Marketplace'}];
 };
 
 export async function loader(args: LoaderFunctionArgs) {
@@ -38,9 +33,19 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
     context.storefront.query(FEATURED_COLLECTION_QUERY),
     // Add other queries here, so that they are loaded in parallel
   ]);
+  console.log('collections', collections.nodes);
+
+  collections.nodes.forEach((collection: FeaturedCollectionFragment) => {
+    console.log('collection handle', collection.handle);
+  });
 
   return {
-    collections: collections.nodes as FeaturedCollectionFragment[],
+    featuredCollection: collections.nodes.filter(
+      (collection: FeaturedCollectionFragment) =>
+        collection.handle === 'essentials' ||
+        collection.handle === 'buy-in-nigeria' ||
+        collection.handle === 'clothing',
+    ) as FeaturedCollectionFragment[],
   };
 }
 
@@ -65,46 +70,39 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
-
   return (
     <div className="home">
-      <h1>Kominifa market place</h1>
-      <CollectionsGrid collections={data.collections} />
+      <FeaturedCollections collections={data.featuredCollection} />
       <RecommendedProducts products={data.recommendedProducts} />
     </div>
   );
 }
 
-function CollectionsGrid({
+function FeaturedCollections({
   collections,
 }: {
   collections: FeaturedCollectionFragment[];
 }) {
-  if (!collections?.length) return null;
-  const {country} = useCountry();
-  const pathPrefix = country === 'US' ? '' : `/${country.toLowerCase()}`;
+  if (!collections) return null;
   return (
-    <div className="collections-grid">
-      {collections.map((collection) => (
-        <Link
-          key={collection.id}
-          className="collection-card"
-          to={`${pathPrefix}/collections/${collection.handle}`}
-        >
-          {collection.image && (
-            <div className="collection-image">
-              <Image
-                data={collection.image}
-                sizes="(min-width: 768px) 25vw, 50vw"
-                width={collection?.image?.width ?? undefined}
-                height={collection?.image?.height ?? undefined}
-                style={{objectFit: 'cover', width: '100%', height: '200px'}}
-              />
-            </div>
-          )}
-          <div className="collection-title">{collection.title}</div>
-        </Link>
-      ))}
+    <div className={`sm:flex sm:justify-between`}>
+      {collections.map((collection) => {
+        const image = collection?.image;
+        return (
+          <Link
+            className="featured-collection"
+            to={`/collections/${collection.handle}`}
+            key={collection.id}
+          >
+            {image && (
+              <div className="featured-collection-image">
+                <Image data={image} sizes="100vw" />
+              </div>
+            )}
+            <h1>{collection.title}</h1>
+          </Link>
+        );
+      })}
     </div>
   );
 }
@@ -114,7 +112,6 @@ function RecommendedProducts({
 }: {
   products: Promise<RecommendedProductsQuery | null>;
 }) {
-
   return (
     <div className="recommended-products">
       <h2>Recommended Products</h2>
@@ -123,9 +120,11 @@ function RecommendedProducts({
           {(response) => (
             <div className="recommended-products-grid">
               {response
-                ? response.products.nodes.map((product) => (
-                    <ProductItem key={product.id} product={product} />
-                  ))
+                ? response.products.nodes.map(
+                    (product: RecommendedProductFragment) => (
+                      <ProductItem key={product.id} product={product} />
+                    ),
+                  )
                 : null}
             </div>
           )}
@@ -151,7 +150,7 @@ const FEATURED_COLLECTION_QUERY = `#graphql
   }
   query FeaturedCollection($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    collections(first: 20, sortKey: UPDATED_AT, reverse: true) {
+    collections(first: 6, sortKey: UPDATED_AT, reverse: false) {
       nodes {
         ...FeaturedCollection
       }
@@ -180,7 +179,7 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   }
   query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 100, sortKey: UPDATED_AT, reverse: true) {
+    products(first: 8, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedProduct
       }

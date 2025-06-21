@@ -19,8 +19,6 @@ declare global {
   const process: {env: {NODE_ENV: 'production' | 'development'}};
 
   interface Env extends HydrogenEnv {
-    HOST: string;
-    PUBLIC_STOREFRONT_API_VERSION: string;
     // declare additional Env parameter use in the fetch handler and Remix loader context here
   }
 }
@@ -31,7 +29,7 @@ declare module 'react-router' {
     // to change context type, change the return of createAppLoadContext() instead
   }
 
-  // TODO: remove this once we've migrated our loaders to `Route.LoaderArgs`
+  // TODO: remove this once we've migrated our loaders to `Route.LoaderArgs` 
   interface LoaderFunctionArgs {
     context: AppLoadContext;
   }
