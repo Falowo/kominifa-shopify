@@ -164,7 +164,8 @@ button.reset:hover:not(:has(> *)) {
 */
 .header {
   align-items: center;
-  background: #fff;
+  background: rgb(26, 46, 5, 0.98);
+  color: white;
   display: flex;
   height: var(--header-height);
   padding: 0 1rem;
@@ -209,7 +210,6 @@ button.reset:hover:not(:has(> *)) {
 .header-ctas > * {
   min-width: fit-content;
 }
-
 
 /*
 * --------------------------------------------------

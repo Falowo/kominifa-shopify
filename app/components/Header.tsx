@@ -9,6 +9,8 @@ import {
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {CountrySelector} from './CountrySelector';
+import {FaShoppingCart} from 'react-icons/fa';
+import {FaSearch} from 'react-icons/fa';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -32,7 +34,7 @@ export function Header({
 }: HeaderProps) {
   const {shop, menu} = header;
   return (
-    <header className="header">
+    <header className="header bg-lime-300/80">
       <NavLink prefetch="intent" to="/" style={activeLinkStyle} end>
         <img
           src="https://cdn.shopify.com/s/files/1/0906/1384/2263/files/ejiogbe.svg?v=1748831331"
@@ -150,7 +152,7 @@ function SearchToggle() {
   const {open} = useAside();
   return (
     <button className="reset" onClick={() => open('search')}>
-      Search
+      <FaSearch />
     </button>
   );
 }
@@ -173,7 +175,10 @@ function CartBadge({count}: {count: number | null}) {
         } as CartViewPayload);
       }}
     >
-      Cart {count === null ? <span>&nbsp;</span> : count}
+      <FaShoppingCart className="relative h-7 w-7 text-lime-200 " />{' '}
+      <span className={`absolute top-1 right-1 rounded-full text-lime-200`}>
+        {count === null ? <span>&nbsp;</span> : count}
+      </span>
     </a>
   );
 }
@@ -245,6 +250,6 @@ function activeLinkStyle({
 }): CSSProperties {
   return {
     fontWeight: isActive ? 'bold' : undefined,
-    color: isPending ? 'grey' : 'black',
+    color: isPending ? 'grey' : 'white',
   };
 }

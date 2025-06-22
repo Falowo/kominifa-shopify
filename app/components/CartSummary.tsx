@@ -3,6 +3,7 @@ import type {CartLayout} from '~/components/CartMain';
 import {CartForm, Money, type OptimisticCart} from '@shopify/hydrogen';
 import {useRef} from 'react';
 import {FetcherWithComponents} from 'react-router';
+import {buttonClassName} from './AddToCartButton';
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
@@ -37,8 +38,10 @@ function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
 
   return (
     <div>
-      <a href={checkoutUrl} target="_self">
-        <p>Continue to Checkout &rarr;</p>
+      <a style={{textDecoration: 'none'}} href={checkoutUrl} target="_self">
+        <p className={`${buttonClassName} min-h-8 flex items-center justify-center`}>
+          <span>Continue to Checkout &rarr;</span>
+        </p>
       </a>
       <br />
     </div>

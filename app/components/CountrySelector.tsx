@@ -68,10 +68,11 @@ export function CountrySelector(): JSX.Element {
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
+        
       }}
     >
       {Object.entries(countries).map(([code, country]) => (
-        <option key={code} value={`${country.country.toLowerCase()}`}>
+        <option className='text-black' key={code} value={`${country.country.toLowerCase()}`}>
           {country.label}
         </option>
       ))}

@@ -1,6 +1,11 @@
 import {type FetcherWithComponents} from 'react-router';
 import {CartForm, type OptimisticCartLineInput} from '@shopify/hydrogen';
 
+export const buttonClassName = `w-max p-2 text-center text-white  shadow-3xl cursor-pointer 
+bg-gradient-to-b from-lime-700 hover:from-lime-600 via-lime-600 hover:via-lime-600 to-lime-800 hover:to-lime-800 
+ font-medium active:bg-gradient-to-t 
+rounded-lg  text-md z-30`;
+
 export function AddToCartButton({
   analytics,
   children,
@@ -24,6 +29,7 @@ export function AddToCartButton({
             value={JSON.stringify(analytics)}
           />
           <button
+            className={`${buttonClassName}`}
             type="submit"
             onClick={onClick}
             disabled={disabled ?? fetcher.state !== 'idle'}

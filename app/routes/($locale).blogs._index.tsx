@@ -4,7 +4,7 @@ import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 
 export const meta: MetaFunction = () => {
-  return [{title: `Hydrogen | Blogs`}];
+  return [{title: `Kominifa shop | Blogs`}];
 };
 
 export async function loader(args: LoaderFunctionArgs) {

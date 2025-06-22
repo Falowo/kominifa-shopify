@@ -20,8 +20,6 @@ import tailwindCss from './styles/tailwind.css?url';
 import {PageLayout} from './components/PageLayout';
 import {getLocaleFromRequest, I18nLocale} from './lib/i18n';
 import {CountryProvider} from './components/CountryProvider';
-import {l} from 'node_modules/react-router/dist/development/lib-CCSAGgcP.mjs';
-import {Header} from './components/Header';
 import {Locale} from './data/countries';
 
 export type RootLoader = typeof loader;
@@ -171,7 +169,7 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className={`bg-yellow-200/60`}>
         {data ? (
           <CountryProvider initialCountry={data.selectedLocale as Locale}>
             <Analytics.Provider
