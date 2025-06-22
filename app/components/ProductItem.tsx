@@ -6,7 +6,6 @@ import type {
   RecommendedProductFragment,
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
-import {useCountry} from '~/components/CountryProvider';
 
 export function ProductItem({
   product,

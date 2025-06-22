@@ -7,6 +7,8 @@ import type {
 import {AddToCartButton} from './AddToCartButton';
 import {useAside} from './Aside';
 import type {ProductFragment} from 'storefrontapi.generated';
+import WhatsappButton from './WhatsappButton';
+import {useLocation} from 'react-router';
 
 export function ProductForm({
   productOptions,
@@ -18,7 +20,7 @@ export function ProductForm({
   const navigate = useNavigate();
   const {open} = useAside();
   return (
-    <div className="product-form">
+    <div className="product-form flex flex-col gap-4">
       {productOptions.map((option) => {
         // If there is only a single value in the option values, don't display the option
         if (option.optionValues.length === 1) return null;
@@ -118,8 +120,14 @@ export function ProductForm({
             : []
         }
       >
-        {selectedVariant?.availableForSale ? 'Add to cart' : 'Sold out'}
+        {selectedVariant?.availableForSale ? 'Add to cart' : 'Add to cart'}
       </AddToCartButton>
+      {!selectedVariant?.availableForSale && (
+        <>
+          <WhatsappButton to="ng" productLink={location.pathname} />
+          <WhatsappButton to="fr" productLink={location.pathname} />
+        </>
+      )}
     </div>
   );
 }

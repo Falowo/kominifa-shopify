@@ -79,7 +79,7 @@ export async function loader(args: LoaderFunctionArgs) {
 
   const {storefront, env} = args.context;
 
-  // ...res
+ 
 
   return {
     ...deferredData,
@@ -92,7 +92,7 @@ export async function loader(args: LoaderFunctionArgs) {
     consent: {
       checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
       storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
-      withPrivacyBanner: false,
+      withPrivacyBanner: true, // Set to true to enable the privacy banner
       // localize the privacy banner
       country: args.context.storefront.i18n.country,
       language: args.context.storefront.i18n.language,
@@ -123,7 +123,7 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
     // Add other queries here, so that they are loaded in parallel
   ]);
 
-  return {header};
+  return {header, storefront};
 }
 
 /**
@@ -157,6 +157,13 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 export function Layout({children}: {children?: React.ReactNode}) {
   const nonce = useNonce();
   const data = useRouteLoaderData<RootLoader>('root');
+
+  // console.log('data in root', data);
+  // console.log('data.selectedLocale', data?.selectedLocale);
+  // console.log('data.i18n', data?.i18n);
+  // console.log('data.shop', data?.shop);
+  // console.log('data.consent', data?.consent);
+
 
   return (
     <html lang={`en`}>
