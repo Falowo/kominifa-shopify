@@ -10,7 +10,6 @@ import {
   Scripts,
   ScrollRestoration,
   useRouteLoaderData,
-  redirect,
 } from 'react-router';
 import favicon from '~/assets/favicon.svg';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';

@@ -18,8 +18,8 @@ export function CountrySelector(): JSX.Element {
   // const currentCountry = useMemo(() => countries[countryKey], [countryKey]);
   // console.log('Current country:', currentCountry);
   const [value, setValue] = useState(
-    rootData?.selectedLocale?.country.toLowerCase() || 'us',
-  ); // Default to 'us'
+    rootData?.selectedLocale?.country.toLowerCase() || 'default',
+  ); // Default to 'default' if no country is set
 
   useEffect(() => {
     // Initialize the country based on the root data
@@ -38,7 +38,7 @@ export function CountrySelector(): JSX.Element {
       const newCountry =
         countries[event.target.value.toLowerCase() as keyof typeof countries];
       const newPrefix =
-        newCountry.country === 'US'
+        newCountry.country === countries['default'].country
           ? ''
           : `/${newCountry.language.toLowerCase()}-${newCountry.country.toLowerCase()}`;
       // ensure we strip any old prefix from the path

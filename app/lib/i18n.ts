@@ -1,6 +1,6 @@
 import type {I18nBase} from '@shopify/hydrogen';
-import {To, useMatches} from 'react-router-dom';
-import {CountriesKey, countries} from '~/data/countries';
+import {To} from 'react-router-dom';
+import {countries} from '~/data/countries';
 import {useCountry} from '~/components/CountryProvider';
 
 export interface I18nLocale extends I18nBase {
@@ -13,8 +13,11 @@ export function getLocaleFromRequest(request: Request): I18nLocale {
 
   type I18nFromUrl = [I18nLocale['language'], I18nLocale['country']];
 
-  let pathPrefix = ''; // Default path prefix
-  let [language, country]: I18nFromUrl = ['EN', 'US'];
+  let pathPrefix = countries['default'].pathPrefix; // Default path prefix
+  let [language, country]: I18nFromUrl = [
+    countries['default'].language,
+    countries['default'].country,
+  ] as I18nFromUrl; // Default to 'default' locale
 
   if (/^[A-Z]{2}-[A-Z]{2}$/i.test(firstPathPart)) {
     pathPrefix = '/' + firstPathPart.toLowerCase();
@@ -25,12 +28,8 @@ export function getLocaleFromRequest(request: Request): I18nLocale {
 }
 
 export function usePrefixPathWithLocale(to: To): To {
-  
   const {country} = useCountry();
 
-  const prefix =
-    country.country === 'US'
-      ? ''
-      : `/${country.language.toLowerCase()}-${country.country.toLowerCase()}`; // Construct the prefix based on the current country
+  const prefix = country.pathPrefix || '';
   return `${prefix}${to.toString()}` as To;
 }

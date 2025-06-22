@@ -44,16 +44,18 @@ const countriesListData: ICountryData[] = countryCodeList
     };
   });
 
+const defaultLocale: Locale = {
+  language: 'FR' as LanguageCode,
+  country: 'FR' as CountryCode,
+  label: 'France',
+  // I want to use the myHost variable from the loader function
+  // to set the host dynamically
+  host: '',
+  pathPrefix: '',
+};
+
 export const countries: Record<string, Locale> = {
-  default: {
-    language: 'FR' as LanguageCode,
-    country: 'FR' as CountryCode,
-    label: 'France',
-    // I want to use the myHost variable from the loader function
-    // to set the host dynamically
-    host: '',
-    pathPrefix: '/fr-fr',
-  },
+  default: defaultLocale,
 
   ...countriesListData.reduce(
     (acc, country) => {
@@ -65,7 +67,10 @@ export const countries: Record<string, Locale> = {
         country: countryCode as CountryCode,
         label: `${country.name}`,
         host: '',
-        pathPrefix: `/${language.toLocaleLowerCase()}-${countryCode.toLowerCase()}`,
+        pathPrefix:
+          country.iso2 === defaultLocale.country
+            ? ''
+            : `/${language.toLocaleLowerCase()}-${countryCode.toLowerCase()}`,
       };
       return acc;
     },
