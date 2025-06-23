@@ -77,6 +77,7 @@ export async function loader(args: LoaderFunctionArgs) {
   const criticalData = await loadCriticalData(args);
 
   const {storefront, env} = args.context;
+  const selectedLocale = getLocaleFromRequest(args.request) as I18nLocale;
 
   return {
     ...deferredData,
@@ -94,8 +95,8 @@ export async function loader(args: LoaderFunctionArgs) {
       country: args.context.storefront.i18n.country,
       language: args.context.storefront.i18n.language,
     },
-    i18n: getLocaleFromRequest(args.request) as I18nLocale,
-    selectedLocale: getLocaleFromRequest(args.request) as I18nLocale,
+    i18n: {...selectedLocale},
+    selectedLocale,
   };
 }
 
