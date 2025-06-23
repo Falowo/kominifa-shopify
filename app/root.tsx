@@ -78,8 +78,6 @@ export async function loader(args: LoaderFunctionArgs) {
 
   const {storefront, env} = args.context;
 
- 
-
   return {
     ...deferredData,
     ...criticalData,
@@ -96,11 +94,7 @@ export async function loader(args: LoaderFunctionArgs) {
       country: args.context.storefront.i18n.country,
       language: args.context.storefront.i18n.language,
     },
-    i18n: {
-      country: args.context.storefront.i18n.country,
-      language: args.context.storefront.i18n.language,
-      pathPrefix: args.context.storefront.i18n.pathPrefix,
-    },
+    i18n: getLocaleFromRequest(args.request) as I18nLocale,
     selectedLocale: getLocaleFromRequest(args.request) as I18nLocale,
   };
 }
@@ -163,7 +157,6 @@ export function Layout({children}: {children?: React.ReactNode}) {
   // console.log('data.shop', data?.shop);
   // console.log('data.consent', data?.consent);
 
-
   return (
     <html lang={`en`}>
       <head>
@@ -175,7 +168,7 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <Meta />
         <Links />
       </head>
-      <body className={`bg-yellow-200/60`}>
+      <body className={`bg-amber-950/20`}>
         {data ? (
           <CountryProvider initialCountry={data.selectedLocale as Locale}>
             <Analytics.Provider
