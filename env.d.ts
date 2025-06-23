@@ -5,6 +5,7 @@
 // Enhance TypeScript's built-in typings.
 import '@total-typescript/ts-reset';
 
+
 import type {
   HydrogenContext,
   HydrogenSessionData,
@@ -20,6 +21,7 @@ declare global {
 
   interface Env extends HydrogenEnv {
     // declare additional Env parameter use in the fetch handler and Remix loader context here
+    PUBLIC_HYDROGEN_DOMAIN: string;
   }
 }
 
@@ -29,7 +31,7 @@ declare module 'react-router' {
     // to change context type, change the return of createAppLoadContext() instead
   }
 
-  // TODO: remove this once we've migrated our loaders to `Route.LoaderArgs` 
+  // TODO: remove this once we've migrated our loaders to `Route.LoaderArgs`
   interface LoaderFunctionArgs {
     context: AppLoadContext;
   }

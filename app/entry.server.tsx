@@ -15,7 +15,10 @@ export default async function handleRequest(
   const {nonce, header, NonceProvider} = createContentSecurityPolicy({
     shop: {
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
-      storeDomain: context.env.PUBLIC_STORE_DOMAIN,
+      storeDomain:
+        process.env.NODE_ENV === 'production'
+          ? context.env.PUBLIC_HYDROGEN_DOMAIN
+          : 'localhost:3000',
     },
   });
 
