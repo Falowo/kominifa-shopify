@@ -45,9 +45,9 @@ const countriesListData: ICountryData[] = countryCodeList
   });
 
 const defaultLocale: Locale = {
-  language: 'FR' as LanguageCode,
-  country: 'FR' as CountryCode,
-  label: 'France',
+  language: 'EN' as LanguageCode,
+  country: 'US' as CountryCode,
+  label: 'United States',
   // I want to use the myHost variable from the loader function
   // to set the host dynamically
   host: '',

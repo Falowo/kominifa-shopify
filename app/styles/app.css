@@ -164,7 +164,7 @@ button.reset:hover:not(:has(> *)) {
 */
 .header {
   align-items: center;
-  background: rgb(26, 46, 5, 0.98);
+  background: rgb(26, 46, 5, 0.96);
   color: white;
   display: flex;
   height: var(--header-height);
