@@ -4,9 +4,15 @@ import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
+import {ProductItemFragment} from 'storefrontapi.generated';
+import type {CollectionItemFragment} from 'storefrontapi.generated';
+import {useState} from 'react';
+import WhatsappButton from '~/components/WhatsappButton';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
-  return [{title: `Kominifa shop | ${data?.collection.title ?? ''} Collection`}];
+  return [
+    {title: `Kominifa shop | ${data?.collection.title ?? ''} Collection`},
+  ];
 };
 
 export async function loader(args: LoaderFunctionArgs) {
@@ -15,8 +21,6 @@ export async function loader(args: LoaderFunctionArgs) {
 
   // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
-
-  
 
   return {...deferredData, ...criticalData};
 }
@@ -31,17 +35,15 @@ async function loadCriticalData({
   request,
 }: LoaderFunctionArgs) {
   const {handle, locale} = params;
-  
+
   const {storefront} = context;
   const paginationVariables = getPaginationVariables(request, {
-    pageBy: 8,
+    pageBy: 40, // the maximum number of products to fetch per page
   });
 
   if (!handle) {
     throw redirect('/collections');
   }
-  
-  
 
   const [{collection}] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
@@ -50,7 +52,7 @@ async function loadCriticalData({
     }),
   ]);
 
-// If the locale param is missing or doesn't match the expected locale, redirect
+  // If the locale param is missing or doesn't match the expected locale, redirect
 
   if (!collection) {
     throw new Response(`Collection ${handle} not found`, {
@@ -78,21 +80,81 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 
 export default function Collection() {
   const {collection} = useLoaderData<typeof loader>();
+  // Import the Collection type from your generated GraphQL types
 
+  const [selectedCollection, setSelectedCollection] = useState<string | null>(
+    null,
+  );
+
+  const collections: Pick<CollectionItemFragment, 'handle' | 'id' | 'title'>[] =
+    collection.products.nodes.reduce(
+      (acc, product) => {
+        product.collections.nodes.forEach((collectionNode) => {
+          // the collection.handle referred to the main collection from the useLoaderData to make sure we don't duplicate it
+          if (
+            !acc.some((c) => c.id === collectionNode.id) &&
+            collectionNode.handle !== collection.handle
+          ) {
+            acc.push({
+              id: collectionNode.id,
+              handle: collectionNode.handle,
+              title: collectionNode.title,
+            });
+          }
+        });
+        return acc;
+      },
+      [] as Pick<CollectionItemFragment, 'handle' | 'id' | 'title'>[],
+    );
+
+  // Filter products by selected collection
+  const filteredProducts = selectedCollection
+    ? collection.products.nodes.filter((product) =>
+        product.collections.nodes.some(
+          (col) => col.handle === selectedCollection,
+        ),
+      )
+    : collection.products.nodes;
 
   return (
     <div className="collection">
       <h1>{collection.title}</h1>
       <p className="collection-description">{collection.description}</p>
+      {collection.handle === 'clothing' && (
+        <WhatsappButton
+          to="fr"
+          message="Require your own Odù model, please contact us to personalize (no engagement)"
+        />
+      )}
+
+      {/* Collection filter menu */}
+
+      <div className="collections-filter m-4">
+        <button
+          className={`mr-2 px-2 py-1 rounded ${!selectedCollection ? 'bg-black text-white' : 'bg-gray-200'}`}
+          onClick={() => setSelectedCollection(null)}
+        >
+          All
+        </button>
+        {collections.map((col) => (
+          <button
+            key={col.id}
+            className={`mr-2 px-2 py-1 rounded ${selectedCollection === col.handle ? 'bg-black text-white' : 'bg-gray-200'}`}
+            onClick={() => setSelectedCollection(col.handle)}
+          >
+            {col.title}
+          </button>
+        ))}
+      </div>
       <PaginatedResourceSection
-        connection={collection.products}
+        connection={{...collection.products, nodes: filteredProducts}}
         resourcesClassName="products-grid"
       >
         {({node: product, index}) => (
           <ProductItem
             key={product.id}
             product={product}
-            loading={index < 8 ? 'eager' : undefined}
+            loading={index < 16 ? 'eager' : undefined}
           />
         )}
       </PaginatedResourceSection>
@@ -117,6 +179,13 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
     id
     handle
     title
+    collections(first: 10) {
+      nodes {
+        id
+        handle
+        title
+      }
+    }
     featuredImage {
       id
       altText

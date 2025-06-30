@@ -10,6 +10,7 @@ import {useVariantUrl} from '~/lib/variants';
 export function ProductItem({
   product,
   loading,
+  
 }: {
   product:
     | CollectionItemFragment

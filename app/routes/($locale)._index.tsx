@@ -9,10 +9,18 @@ import type {
   RecommendedProductsQuery,
 } from 'storefrontapi.generated';
 import {ProductItem} from '~/components/ProductItem';
+import {CollectionSortKeys} from '@shopify/hydrogen/storefront-api-types';
 
 export const meta: MetaFunction = () => {
   return [{title: 'Kominifa | Marketplace'}];
 };
+
+const collectionSortKeys: CollectionSortKeys[] = [
+  'TITLE' as CollectionSortKeys,
+  'UPDATED_AT' as CollectionSortKeys,
+  'ID' as CollectionSortKeys,
+  'RELEVANCE' as CollectionSortKeys,
+];
 
 export async function loader(args: LoaderFunctionArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -99,7 +107,14 @@ function FeaturedCollections({
                 <Image data={image} sizes="100vw" />
               </div>
             )}
-            <h1>{collection.title}</h1>
+            <h1>
+              {`${collection.title} `}
+              {collection.handle === 'essentials' ? (
+                <span className={`text-sm`}>sales in EU</span>
+              ) : collection.handle === 'buy-in-nigeria' ? (
+                <span className={`text-sm`}>worldwide (whole)sales</span>
+              ) : null}
+            </h1>
           </Link>
         );
       })}
@@ -150,7 +165,7 @@ const FEATURED_COLLECTION_QUERY = `#graphql
   }
   query FeaturedCollection($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    collections(first: 6, sortKey: UPDATED_AT, reverse: false) {
+    collections(first: 6, sortKey: ID, reverse: false) {
       nodes {
         ...FeaturedCollection
       }

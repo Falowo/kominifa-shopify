@@ -29,7 +29,7 @@ export function AddToCartButton({
             value={JSON.stringify(analytics)}
           />
           <button
-            className={`${buttonClassName} ${disabled ? 'opacity-30 cursor-none' : 'cursor-pointer'}`}
+            className={`${buttonClassName} ${disabled ? 'opacity-0 cursor-none' : 'cursor-pointer'}`}
             type="submit"
             onClick={onClick}
             disabled={disabled ?? fetcher.state !== 'idle'}

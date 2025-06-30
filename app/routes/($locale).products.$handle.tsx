@@ -82,6 +82,8 @@ function loadDeferredData({context, params}: LoaderFunctionArgs) {
 
 export default function Product() {
   const {product} = useLoaderData<typeof loader>();
+  console.log('product ++++++++++++++++++++++++++++++++++++', product);
+  console.log('product collections', product.collections.nodes);
 
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
@@ -185,6 +187,14 @@ const PRODUCT_FRAGMENT = `#graphql
     id
     title
     vendor
+    collections(first: 10) {
+      nodes {
+        id
+        handle
+        title
+      }
+    }
+    tags 
     handle
     descriptionHtml
     description

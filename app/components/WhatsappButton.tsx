@@ -6,9 +6,11 @@ import {useWindowSize} from '@uidotdev/usehooks';
 export default function WhatsappButton({
   to,
   productLink,
+  message,
 }: {
   to?: 'ng' | 'fr';
   productLink?: string;
+  message?: string;
 }) {
   const phoneNumber = to === 'ng' ? '2348144337778' : '33660750932'; // Replace with your WhatsApp numbers for each country
   const text = productLink
@@ -40,12 +42,13 @@ export default function WhatsappButton({
     >
       {to === 'ng' ? (
         <span className=" text-lime-950 px-2 rounded-md pt-auto">
-          Available Worldwide for sales and wholesales | Inquire with Ifadara
-          (Nigeria)
+          {message ??
+            `Available Worldwide for sales and wholesales | Inquire with Ifadara
+          (Nigeria)`}
         </span>
       ) : (
         <span className=" text-lime-950 px-2 rounded-md pt-auto">
-          Inquire about it to Ifalowo (France)
+          {message ?? `Inquire about it to Ifalowo (France)`}
         </span>
       )}
       <FaWhatsapp className={`text-2xl lg:text-3xl rounded-md text-lime-700`} />

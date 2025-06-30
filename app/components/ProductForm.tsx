@@ -8,11 +8,11 @@ import {AddToCartButton} from './AddToCartButton';
 import {useAside} from './Aside';
 import type {ProductFragment} from 'storefrontapi.generated';
 import WhatsappButton from './WhatsappButton';
-import {useLocation} from 'react-router';
 
 export function ProductForm({
   productOptions,
   selectedVariant,
+  
 }: {
   productOptions: MappedProductOptions[];
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
@@ -81,7 +81,7 @@ export function ProductForm({
                         border: selected
                           ? '1px solid black'
                           : '1px solid transparent',
-                        opacity: available ? 1 : 0.3,
+                        opacity: available ? 1 : 0.1,
                       }}
                       disabled={!exists}
                       onClick={() => {
