@@ -123,7 +123,7 @@ export default function Collection() {
       {collection.handle === 'clothing' && (
         <WhatsappButton
           to="fr"
-          message="Require your own Odù model, please contact us to personalize (no engagement)"
+          message="Please contact us to personalize (free of charge), your Odù, your text, your favorite colors. We will send you a private link with your model so you can preview it."
         />
       )}
 
