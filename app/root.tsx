@@ -78,6 +78,27 @@ export async function loader(args: LoaderFunctionArgs) {
 
   const {storefront, env} = args.context;
   const selectedLocale = getLocaleFromRequest(args.request) as I18nLocale;
+  const cartViewed = await args.context.cart.get();
+  const cartBuyerIdentityCountry = cartViewed?.buyerIdentity.countryCode;
+
+  if (cartViewed && cartBuyerIdentityCountry !== selectedLocale.country) {
+    try {
+      await args.context.cart.updateBuyerIdentity({
+        countryCode: 'FR',
+      });
+      console.log(
+        `Cart buyer identity updated to country: ${selectedLocale.country}`,
+      );
+    } catch (error) {
+      console.error('Error updating cart buyer identity:', error);
+    }
+  } else {
+    console.log(
+      `Cart buyer identity already matches selected locale country: ${selectedLocale.country}`,
+    );
+    console.log(`Cart buyer identity country: ${cartBuyerIdentityCountry}`);
+    console.log(`Selected locale country: ${selectedLocale.country}`);
+  }
 
   return {
     ...deferredData,
@@ -92,11 +113,13 @@ export async function loader(args: LoaderFunctionArgs) {
       storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
       withPrivacyBanner: true, // Set to true to enable the privacy banner
       // localize the privacy banner
-      country: args.context.storefront.i18n.country,
-      language: args.context.storefront.i18n.language,
+      country: selectedLocale.country,
+      language: selectedLocale.language,
     },
     i18n: {...selectedLocale},
     selectedLocale,
+    context: args.context,
+    cartHandler: args.context.cart,
   };
 }
 

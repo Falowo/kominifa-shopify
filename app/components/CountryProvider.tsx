@@ -1,10 +1,8 @@
 import {createContext, useContext, useState, ReactNode} from 'react';
-// import {useLocation, useNavigate} from 'react-router-dom';
 import {
   type Locale,
   countries,
 } from '~/data/countries';
-// import {redirect} from '@shopify/remix-oxygen';
 
 const CountryContext = createContext<{
   country: Locale;

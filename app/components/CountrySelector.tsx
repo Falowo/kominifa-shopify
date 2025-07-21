@@ -3,13 +3,19 @@ import {useNavigate, useLocation, useMatches} from 'react-router';
 import {countries, CountriesKey} from '~/data/countries';
 import {useCountry} from './CountryProvider';
 // import {useCountryKey} from './CountryKeyProvider';
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useState, useTransition} from 'react';
 
-export function CountrySelector(): JSX.Element {
+export function CountrySelector() {
+  const [isPending, startTransition] = useTransition();
   const {country, setCountry} = useCountry();
   const matches = useMatches();
   const rootData = matches.find((m) => m.id === 'root')?.data as {
     selectedLocale?: {pathPrefix: string; country: string; language: string};
+    cartHandler?: {
+      updateBuyerIdentity: (buyerIdentity: {
+        countryCode: string;
+      }) => Promise<void>;
+    };
   };
   const navigate = useNavigate();
   const location = useLocation();
@@ -21,20 +27,16 @@ export function CountrySelector(): JSX.Element {
     rootData?.selectedLocale?.country.toLowerCase() || 'default',
   ); // Default to 'default' if no country is set
 
-  useEffect(() => {
-    // Initialize the country based on the root data
-    const initialCountry = countries[value.toLowerCase() as CountriesKey];
-    if (initialCountry) {
-      setCountry(initialCountry);
-    }
-  }, [value, setCountry]);
-
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     if ((event.target.value.toLowerCase() as CountriesKey) !== value) {
-      // setCountryKey(event.target.value.toLowerCase() as CountriesKey);
-      setValue(event.target.value); // Update the value based on the selected country
-      setCountry(countries[event.target.value.toLowerCase() as CountriesKey]);
+      startTransition(() => {
+        // Update the country in the context
+       
+        setValue(event.target.value); // Update the value based on the selected country
+        setCountry(countries[event.target.value.toLowerCase() as CountriesKey]);
 
+        // Update the country in the context
+      });
       const newCountry =
         countries[event.target.value.toLowerCase() as keyof typeof countries];
       const newPrefix =
@@ -53,9 +55,15 @@ export function CountrySelector(): JSX.Element {
       console.log('New path :', newPath);
       navigate(newPath);
     }
-    console.log('Selected value:', event.target.value);
-    console.log('Updated country key:', event.target.value.toLowerCase());
   };
+
+  useEffect(() => {
+    // Initialize the country based on the root data
+    const initialCountry = countries[value.toLowerCase() as CountriesKey];
+    if (initialCountry) {
+      setCountry(initialCountry);
+    }
+  }, [value, setCountry]);
 
   return (
     <select
@@ -68,11 +76,14 @@ export function CountrySelector(): JSX.Element {
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
-        
       }}
     >
       {Object.entries(countries).map(([code, country]) => (
-        <option className='text-black' key={code} value={`${country.country.toLowerCase()}`}>
+        <option
+          className="text-black"
+          key={code}
+          value={`${country.country.toLowerCase()}`}
+        >
           {country.label}
         </option>
       ))}

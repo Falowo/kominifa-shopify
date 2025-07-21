@@ -1,5 +1,4 @@
 // app/components/Link.tsx
-import { useCallback } from 'react';
 import {
   Link as RouterLink,
   NavLink as RouterNavLink,
@@ -15,6 +14,9 @@ import {usePrefixPathWithLocale} from '~/lib/i18n';
 export function Link(props: RouterLinkProps) {
   const {to, ...rest} = props;
   const toWithLocale =  usePrefixPathWithLocale(to.toString());
+
+console.log('Link toWithLocale:', toWithLocale);
+
   return <RouterLink to={toWithLocale} {...rest} />;
 }
 
