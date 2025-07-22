@@ -20,6 +20,7 @@ import {PageLayout} from './components/PageLayout';
 import {getLocaleFromRequest, I18nLocale} from './lib/i18n';
 import {CountryProvider} from './components/CountryProvider';
 import {Locale} from './data/countries';
+import {CartInput} from '@shopify/hydrogen/storefront-api-types';
 
 export type RootLoader = typeof loader;
 
@@ -79,9 +80,15 @@ export async function loader(args: LoaderFunctionArgs) {
   const {storefront, env} = args.context;
   const selectedLocale = getLocaleFromRequest(args.request) as I18nLocale;
   const cartViewed = await args.context.cart.get();
+  const cartBuyerIdentityLastName =
+    cartViewed?.buyerIdentity?.customer?.lastName;
   const cartBuyerIdentityCountry = cartViewed?.buyerIdentity.countryCode;
 
-  if (cartViewed && cartBuyerIdentityCountry !== selectedLocale.country) {
+  if (
+    cartViewed &&
+    !cartBuyerIdentityLastName &&
+    cartBuyerIdentityCountry !== 'FR'
+  ) {
     try {
       await args.context.cart.updateBuyerIdentity({
         countryCode: 'FR',
@@ -92,7 +99,14 @@ export async function loader(args: LoaderFunctionArgs) {
     } catch (error) {
       console.error('Error updating cart buyer identity:', error);
     }
-  } else {
+  }
+   else if (!cartViewed) {
+    console.log('No cart viewed, skipping buyer identity update.');
+    await args.context.cart.create({
+      cart: {buyerIdentity: {countryCode: 'FR'}},
+    } as CartInput);
+  }
+   else {
     console.log(
       `Cart buyer identity already matches selected locale country: ${selectedLocale.country}`,
     );
