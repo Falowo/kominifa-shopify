@@ -33,3 +33,16 @@ export function usePrefixPathWithLocale(to: To): To {
   const prefix = country.pathPrefix || '';
   return `${prefix}${to.toString()}` as To;
 }
+
+export function getLocaleFromCartBuyerIdentity(
+  buyerIdentity: {countryCode: string, lastName: string} | null,
+): I18nLocale | undefined {
+  const countryCode = buyerIdentity?.countryCode || 'FR';
+  const country = countries[countryCode] || countries['FR'];
+
+  return {
+    language: country.language,
+    country: country.country,
+    pathPrefix: country.pathPrefix || '',
+  };
+}

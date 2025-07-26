@@ -1,3 +1,5 @@
+// File: app/entry.server.tsx
+
 import type {AppLoadContext} from '@shopify/remix-oxygen';
 import {ServerRouter} from 'react-router';
 import {isbot} from 'isbot';
@@ -20,6 +22,13 @@ export default async function handleRequest(
           ? context.env.PUBLIC_HYDROGEN_DOMAIN
           : 'localhost:3000',
     },
+    // Optionally, you can customize directives like connectSrc if needed:
+    connectSrc: [
+      "'self'",
+      'https://cdn.shopify.com',
+      `https://${context.env.PUBLIC_CHECKOUT_DOMAIN}`,
+      `https://${context.env.PUBLIC_HYDROGEN_DOMAIN}`,
+    ],
   });
 
   const body = await renderToReadableStream(

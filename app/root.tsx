@@ -1,3 +1,5 @@
+// File: app/root.tsx
+
 import {Analytics, getShopAnalytics, useNonce} from '@shopify/hydrogen';
 import {type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {
@@ -99,25 +101,27 @@ export async function loader(args: LoaderFunctionArgs) {
     } catch (error) {
       console.error('Error updating cart buyer identity:', error);
     }
-  }
-   else if (!cartViewed) {
+  } else if (!cartViewed) {
     console.log('No cart viewed, skipping buyer identity update.');
     await args.context.cart.create({
       cart: {buyerIdentity: {countryCode: 'FR'}},
     } as CartInput);
-  }
-   else {
+  } else {
     console.log(
       `Cart buyer identity already matches selected locale country: ${selectedLocale.country}`,
     );
     console.log(`Cart buyer identity country: ${cartBuyerIdentityCountry}`);
     console.log(`Selected locale country: ${selectedLocale.country}`);
   }
+  console.log("env.PUBLIC_CHECKOUT_DOMAIN :", env.PUBLIC_CHECKOUT_DOMAIN);
+  console.log("env.PUBLIC_STORE_DOMAIN :", env.PUBLIC_STORE_DOMAIN);
 
   return {
     ...deferredData,
     ...criticalData,
-    publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
+    // publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
+    publicStoreDomain: env.PUBLIC_HYDROGEN_DOMAIN,
+
     shop: getShopAnalytics({
       storefront,
       publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
@@ -222,6 +226,7 @@ export function Layout({children}: {children?: React.ReactNode}) {
         )}
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
+          
       </body>
     </html>
   );
