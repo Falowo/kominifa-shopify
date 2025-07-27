@@ -1,3 +1,5 @@
+// File: app/routes/($locale).cart.tsx  
+
 import {type MetaFunction, useLoaderData} from 'react-router';
 import type {CartQueryDataReturn} from '@shopify/hydrogen';
 import {CartForm} from '@shopify/hydrogen';

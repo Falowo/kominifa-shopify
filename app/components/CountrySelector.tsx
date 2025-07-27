@@ -1,42 +1,55 @@
+// File: app/components/CountrySelector.tsx
+
 import {useNavigate, useLocation, useMatches} from 'react-router';
 // import type {Locale} from '~/data/countries';
 import {countries, CountriesKey} from '~/data/countries';
 import {useCountry} from './CountryProvider';
 // import {useCountryKey} from './CountryKeyProvider';
 import {useEffect, useState, useTransition} from 'react';
+import {CartForm} from '@shopify/hydrogen';
+import { CountryCode } from '@shopify/hydrogen/customer-account-api-types';
 
 export function CountrySelector() {
-  const [isPending, startTransition] = useTransition();
   const {country, setCountry} = useCountry();
   const matches = useMatches();
   const rootData = matches.find((m) => m.id === 'root')?.data as {
     selectedLocale?: {pathPrefix: string; country: string; language: string};
-    cartHandler?: {
-      updateBuyerIdentity: (buyerIdentity: {
-        countryCode: string;
-      }) => Promise<void>;
-    };
+    
   };
   const navigate = useNavigate();
   const location = useLocation();
-  // const {countryKey, setCountryKey} = useCountryKey();
-  // console.log('CountrySelector:', {countryKey}, {i18n});
-  // const currentCountry = useMemo(() => countries[countryKey], [countryKey]);
-  // console.log('Current country:', currentCountry);
+  
   const [value, setValue] = useState(
     rootData?.selectedLocale?.country.toLowerCase() || 'default',
   ); // Default to 'default' if no country is set
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    if ((event.target.value.toLowerCase() as CountriesKey) !== value) {
-      startTransition(() => {
-        // Update the country in the context
-       
+  const handleChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+   const newCountryCode = event.target.value.toUpperCase() as CountryCode;
         setValue(event.target.value); // Update the value based on the selected country
         setCountry(countries[event.target.value.toLowerCase() as CountriesKey]);
 
-        // Update the country in the context
-      });
+// Prepare the cartFormInput payload
+    const cartFormInput = {
+      action: CartForm.ACTIONS.BuyerIdentityUpdate,
+      inputs: {
+        buyerIdentity: {
+          countryCode: newCountryCode,
+        },
+      },
+    };
+
+    // Send a fetch POST request to the cart action endpoint
+try {
+    await fetch('/cart', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: new URLSearchParams({
+        cartFormInput: JSON.stringify(cartFormInput),
+      }),
+    });} catch (error) {
+      console.error('Error updating cart buyer identity:', error);
+    }
+
       const newCountry =
         countries[event.target.value.toLowerCase() as keyof typeof countries];
       const newPrefix =
@@ -54,7 +67,6 @@ export function CountrySelector() {
       // If on a different page, we need to handle the path accordingly
       console.log('New path :', newPath);
       navigate(newPath);
-    }
   };
 
   useEffect(() => {
@@ -66,9 +78,11 @@ export function CountrySelector() {
   }, [value, setCountry]);
 
   return (
+    
     <select
       value={value}
       onChange={handleChange}
+      
       style={{
         width: '88px',
         minWidth: '88px',
@@ -88,6 +102,7 @@ export function CountrySelector() {
         </option>
       ))}
     </select>
+    
   );
 }
 // This component allows users to select a country from a dropdown.

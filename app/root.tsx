@@ -22,7 +22,7 @@ import {PageLayout} from './components/PageLayout';
 import {getLocaleFromRequest, I18nLocale} from './lib/i18n';
 import {CountryProvider} from './components/CountryProvider';
 import {Locale} from './data/countries';
-import {CartInput} from '@shopify/hydrogen/storefront-api-types';
+import { CartInput } from '@shopify/hydrogen/storefront-api-types';
 
 export type RootLoader = typeof loader;
 
@@ -79,42 +79,49 @@ export async function loader(args: LoaderFunctionArgs) {
   // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
 
-  const {storefront, env} = args.context;
+  const {storefront, env, cart} = args.context;
   const selectedLocale = getLocaleFromRequest(args.request) as I18nLocale;
-  const cartViewed = await args.context.cart.get();
-  const cartBuyerIdentityLastName =
-    cartViewed?.buyerIdentity?.customer?.lastName;
-  const cartBuyerIdentityCountry = cartViewed?.buyerIdentity.countryCode;
+  
+  
+  let cartViewed = await args.context.cart.get();
 
-  if (
-    cartViewed &&
-    !cartBuyerIdentityLastName &&
-    cartBuyerIdentityCountry !== 'FR'
-  ) {
-    try {
-      await args.context.cart.updateBuyerIdentity({
-        countryCode: 'FR',
-      });
-      console.log(
-        `Cart buyer identity updated to country: ${selectedLocale.country}`,
-      );
-    } catch (error) {
-      console.error('Error updating cart buyer identity:', error);
-    }
-  } else if (!cartViewed) {
-    console.log('No cart viewed, skipping buyer identity update.');
-    await args.context.cart.create({
+  if (!cartViewed) {
+    const createdCart = await cart.create({
       cart: {buyerIdentity: {countryCode: 'FR'}},
     } as CartInput);
-  } else {
-    console.log(
-      `Cart buyer identity already matches selected locale country: ${selectedLocale.country}`,
-    );
-    console.log(`Cart buyer identity country: ${cartBuyerIdentityCountry}`);
-    console.log(`Selected locale country: ${selectedLocale.country}`);
+    cartViewed = createdCart.cart;
   }
-  console.log("env.PUBLIC_CHECKOUT_DOMAIN :", env.PUBLIC_CHECKOUT_DOMAIN);
-  console.log("env.PUBLIC_STORE_DOMAIN :", env.PUBLIC_STORE_DOMAIN);
+  // const cartBuyerIdentityLastName =
+  //   cartViewed?.buyerIdentity?.customer?.lastName;
+  // const cartBuyerIdentityCountry = cartViewed?.buyerIdentity.countryCode;
+
+  // if (
+  //   cartViewed &&
+  //   !cartBuyerIdentityLastName &&
+  //   cartBuyerIdentityCountry !== 'FR'
+  // ) {
+  //   try {
+  //     await args.context.cart.updateBuyerIdentity({
+  //       countryCode: 'FR',
+  //     });
+  //     console.log(
+  //       `Cart buyer identity updated to country: ${selectedLocale.country}`,
+  //     );
+  //   } catch (error) {
+  //     console.error('Error updating cart buyer identity:', error);
+  //   }
+  // } else if (!cartViewed) {
+  //   console.log('No cart viewed, skipping buyer identity update.');
+  //   await args.context.cart.create({
+  //     cart: {buyerIdentity: {countryCode: 'FR'}},
+  //   } as CartInput);
+  // } else {
+  //   console.log(
+  //     `Cart buyer identity already matches selected locale country: ${selectedLocale.country}`,
+  //   );
+    console.log(`Selected locale country: ${selectedLocale.country}`);
+  // }
+  
 
   return {
     ...deferredData,
@@ -136,8 +143,6 @@ export async function loader(args: LoaderFunctionArgs) {
     },
     i18n: {...selectedLocale},
     selectedLocale,
-    context: args.context,
-    cartHandler: args.context.cart,
   };
 }
 
