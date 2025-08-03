@@ -126,8 +126,8 @@ export async function loader(args: LoaderFunctionArgs) {
   return {
     ...deferredData,
     ...criticalData,
-    // publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
-    publicStoreDomain: env.PUBLIC_HYDROGEN_DOMAIN,
+    publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
+    // publicStoreDomain: env.PUBLIC_HYDROGEN_DOMAIN,
 
     shop: getShopAnalytics({
       storefront,
