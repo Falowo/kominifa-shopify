@@ -22,7 +22,7 @@ import {PageLayout} from './components/PageLayout';
 import {getLocaleFromRequest, I18nLocale} from './lib/i18n';
 import {CountryProvider} from './components/CountryProvider';
 import {Locale} from './data/countries';
-import { CartInput } from '@shopify/hydrogen/storefront-api-types';
+import {CartInput} from '@shopify/hydrogen/storefront-api-types';
 
 export type RootLoader = typeof loader;
 
@@ -81,8 +81,7 @@ export async function loader(args: LoaderFunctionArgs) {
 
   const {storefront, env, cart} = args.context;
   const selectedLocale = getLocaleFromRequest(args.request) as I18nLocale;
-  
-  
+
   let cartViewed = await args.context.cart.get();
 
   if (!cartViewed) {
@@ -119,14 +118,13 @@ export async function loader(args: LoaderFunctionArgs) {
   //   console.log(
   //     `Cart buyer identity already matches selected locale country: ${selectedLocale.country}`,
   //   );
-    console.log(`Selected locale country: ${selectedLocale.country}`);
+  console.log(`Selected locale country: ${selectedLocale.country}`);
   // }
-  
 
   return {
     ...deferredData,
     ...criticalData,
-    publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
+    publicStoreDomain: env.PUBLIC_HYDROGEN_DOMAIN,
     // publicStoreDomain: env.PUBLIC_HYDROGEN_DOMAIN,
 
     shop: getShopAnalytics({
@@ -231,7 +229,6 @@ export function Layout({children}: {children?: React.ReactNode}) {
         )}
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
-          
       </body>
     </html>
   );

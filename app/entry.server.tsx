@@ -17,7 +17,7 @@ export default async function handleRequest(
   const {nonce, header, NonceProvider} = createContentSecurityPolicy({
     shop: {
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
-      storeDomain: context.env.PUBLIC_STORE_DOMAIN,
+      storeDomain: context.env.PUBLIC_HYDROGEN_DOMAIN,
     },
     // Optionally, you can customize directives like connectSrc if needed:
     connectSrc: [
@@ -25,7 +25,7 @@ export default async function handleRequest(
       'https://cdn.shopify.com',
       `https://${context.env.PUBLIC_CHECKOUT_DOMAIN}`,
       `https://${context.env.PUBLIC_HYDROGEN_DOMAIN}`,
-      `https://${context.env.PUBLIC_STORE_DOMAIN}`,
+      'https://shop.app/api/unstable/graphql.json',
       'http://localhost:3000',
     ],
   });
